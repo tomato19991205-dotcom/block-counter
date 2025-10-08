@@ -1,7 +1,6 @@
 flask
-pdfplumber
-waitress
-opencv-python
+pdf2image
+opencv-python-headless
 numpy
 Pillow
-PyMuPDF
+fitz
