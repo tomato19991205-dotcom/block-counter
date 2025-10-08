@@ -20,19 +20,22 @@
   </form>
 
   {% if result %}
-    {% if result.error %}
-      <p class="result">⚠️ {{ result.error }}</p>
-    {% else %}
-      <div class="result">
-        <p>🟥 検出ブロック数：{{ result.count }}</p>
-        <p>📏 全長：{{ result.total_length }}</p>
-        <p>📐 高さ：{{ result.height }}</p>
-        {% if result.image_base64 %}
-          <img src="data:image/png;base64,{{ result.image_base64 }}" alt="検出画像">
-        {% endif %}
-      </div>
-    {% endif %}
+  {% if result.error %}
+    <p style="color:red;">エラー: {{ result.error }}</p>
+  {% else %}
+    <div class="result">
+      <p>🧱 検出ブロック数: {{ result.blocks }}</p>
+      <p>📏 全長: {{ result.total_length }}</p>
+      <p>📐 高さ: {{ result.height }}cm</p>
+      {% if result.image_base64 %}
+        <h3>🔴 検出結果プレビュー</h3>
+        <img src="data:image/png;base64,{{ result.image_base64 }}" style="width:95%;max-width:1200px;">
+      {% endif %}
+    </div>
   {% endif %}
+{% else %}
+  <p>PDFファイルを選択して解析を開始してください。</p>
+{% endif %}
 </body>
 </html>
 {% if result.image %}
