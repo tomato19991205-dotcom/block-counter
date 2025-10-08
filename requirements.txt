@@ -4,3 +4,4 @@ waitress
 opencv-python
 numpy
 Pillow
+PyMuPDF
