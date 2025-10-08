@@ -1,33 +1,37 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ブロックカウンター AI版</title>
-<style>
-body{font-family:sans-serif;text-align:center;padding:16px}
-img{width:94%;max-width:1200px;border:1px solid #ccc;border-radius:8px;margin-top:10px}
-.result{font-size:18px;margin-top:14px;color:#222}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ブロックカウンター AI版</title>
+  <style>
+    body{font-family:sans-serif; text-align:center; padding:1.2rem;}
+    img{width:94%; max-width:1200px;}
+    .result{font-size:18px; margin-top:1rem;}
+  </style>
 </head>
 <body>
-<h1>🧱 ブロックカウンター AI版</h1>
-<form action="/upload" method="POST" enctype="multipart/form-data">
-  <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required>
-  <button type="submit">解析開始</button>
-</form>
+  <h1>🧱 ブロックカウンター AI版</h1>
 
-{% if result %}
-  {% if result.error %}
-    <p class="result">⚠️ {{ result.error }}</p>
-  {% else %}
-    <div class="result">
-      <p>🟥 検出ブロック数：{{ result.count }} 個</p>
-      <p>📏 全長：{{ result.total_length_m }} m</p>
-      <p>📐 高さ：約 {{ result.height_m }} m</p>
-      <img src="data:image/png;base64,{{ result.img_b64 }}">
-    </div>
+  <!-- ここがポイント：action="/upload" を追加 -->
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+    <input type="file" name="file" accept="application/pdf" required>
+    <button type="submit">解析開始</button>
+  </form>
+
+  {% if result %}
+    {% if result.error %}
+      <p class="result">⚠️ {{ result.error }}</p>
+    {% else %}
+      <div class="result">
+        <p>🟥 検出ブロック数：{{ result.count }}</p>
+        <p>📏 全長：{{ result.total_length }}</p>
+        <p>📐 高さ：{{ result.height }}</p>
+        {% if result.image_base64 %}
+          <img src="data:image/png;base64,{{ result.image_base64 }}" alt="検出画像">
+        {% endif %}
+      </div>
+    {% endif %}
   {% endif %}
-{% endif %}
 </body>
 </html>
