@@ -1,44 +1,38 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ブロックカウンター AI版</title>
-  <style>
-    body{font-family:sans-serif; text-align:center; padding:1.2rem;}
-    img{width:94%; max-width:1200px;}
-    .result{font-size:18px; margin-top:1rem;}
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ブロックカウンター AI版</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin: 40px; }
+        img { width: 95%; max-width: 800px; margin-top: 15px; }
+        .result { font-size: 18px; margin-top: 10px; }
+        button { padding: 6px 15px; font-size: 16px; margin-top: 10px; }
+    </style>
 </head>
 <body>
-  <h1>🧱 ブロックカウンター AI版</h1>
+    <h1>🧱 ブロックカウンター AI版</h1>
 
-  <!-- ここがポイント：action="/upload" を追加 -->
-  <form method="POST" action="/upload" enctype="multipart/form-data">
-    <input type="file" name="file" accept="application/pdf" required>
-    <button type="submit">解析開始</button>
-  </form>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf">
+        <button type="submit">解析開始</button>
+    </form>
 
-  {% if result %}
-  {% if result.error %}
-    <p style="color:red;">エラー: {{ result.error }}</p>
-  {% else %}
-    <div class="result">
-      <p>🧱 検出ブロック数: {{ result.blocks }}</p>
-      <p>📏 全長: {{ result.total_length }}</p>
-      <p>📐 高さ: {{ result.height }}cm</p>
-      {% if result.image_base64 %}
-        <h3>🔴 検出結果プレビュー</h3>
-        <img src="data:image/png;base64,{{ result.image_base64 }}" style="width:95%;max-width:1200px;">
-      {% endif %}
-    </div>
-  {% endif %}
-{% else %}
-  <p>PDFファイルを選択して解析を開始してください。</p>
-{% endif %}
+    {% if result %}
+        {% if result.error %}
+            <p class="result">⚠️ {{ result.error }}</p>
+        {% else %}
+            <div class="result">
+                <p>🧱 検出ブロック数：{{ result.block_count }}</p>
+                <p>📏 全長：{{ result.total_length }}</p>
+                <p>📐 高さ：{{ result.height }}cm</p>
+                {% if result.image_base64 %}
+                    <h3>📸 検出プレビュー</h3>
+                    <img src="data:image/png;base64,{{ result.image_base64 }}">
+                {% endif %}
+            </div>
+        {% endif %}
+    {% endif %}
 </body>
 </html>
-{% if result.image %}
-    <h3>🔴 検出結果プレビュー</h3>
-    <img src="data:image/png;base64,{{ result.image }}" style="width:95%;max-width:1200px;">
-{% endif %}
