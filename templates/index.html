@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブロックカウンター AI版</title>
+<style>
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #fff;
+  padding: 1rem;
+}
+h1 {
+  color: #333;
+}
+input {
+  margin: 1rem;
+}
+img {
+  width: 90%;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+.result {
+  font-size: 18px;
+  color: #222;
+  margin-top: 15px;
+}
+</style>
+</head>
+<body>
+<h1>🧱 ブロックカウンター AI版</h1>
+<form method="POST" enctype="multipart/form-data">
+  <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required><br>
+  <button type="submit">解析開始</button>
+</form>
+
+{% if result %}
+<div class="result">
+  <p>🟥 検出ブロック数：{{ result.count }} 個</p>
+  <p>📏 全長：{{ result.total_length_m }} m</p>
+  <p>📐 高さ：約 {{ result.height_m }} m</p>
+  <img src="data:image/png;base64,{{ result.img_b64 }}">
+</div>
+{% endif %}
+</body>
+</html>
