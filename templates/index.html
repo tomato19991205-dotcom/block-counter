@@ -35,3 +35,7 @@
   {% endif %}
 </body>
 </html>
+{% if result.image %}
+    <h3>🔴 検出結果プレビュー</h3>
+    <img src="data:image/png;base64,{{ result.image }}" style="width:95%;max-width:1200px;">
+{% endif %}
