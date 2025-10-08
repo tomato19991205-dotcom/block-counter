@@ -38,19 +38,35 @@ def upload():
         # ノイズ除去
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((3,3), np.uint8))
 
-        # 輪郭検出
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        block_count = 0
-        total_length = 0
+        # ---- 改良版ブロック検出 ----
+# グレースケール変換
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        for c in contours:
-            x, y, w, h = cv2.boundingRect(c)
-            if 30 < w < 2000 and 5 < h < 200:  # ブロックっぽい領域だけ
-                block_count += 1
-                total_length += w
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+# ノイズ除去
+blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
-        # 結果画像をBase64に変換
+# エッジ検出
+edges = cv2.Canny(blur, 80, 180)
+
+# 線を太らせて連続性を上げる
+kernel = np.ones((2, 2), np.uint8)
+dilated = cv2.dilate(edges, kernel, iterations=1)
+
+# 輪郭を検出
+contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+block_count = 0
+total_length = 0
+
+for c in contours:
+    x, y, w, h = cv2.boundingRect(c)
+    # 小さすぎる線、文字、寸法などを除外
+    if w > 40 and h > 10:
+        aspect = w / h
+        if 1.5 < aspect < 8:  # 横長すぎず縦長すぎない長方形
+            block_count += 1
+            total_length += w
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
         _, buffer = cv2.imencode('.png', img)
         img_base64 = base64.b64encode(buffer).decode('utf-8')
 
