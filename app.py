@@ -13,7 +13,6 @@ def handle_upload():
     f = request.files.get("file")
     msg = f"受け取りOK：{f.filename}" if f else "ファイルがありません"
     return render_template("index.html", message=msg)
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # ★RenderのPORTを使う
-    app.run(host="0.0.0.0", port=port)
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=10000)
