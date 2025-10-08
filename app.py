@@ -25,7 +25,11 @@ def upload_file():
             if text:
                 total_length += len(text)
 
-    return jsonify({"result": f"解析完了: {total_length}文字分のデータを検出しました！"})
+    return render_template("index.html", result={
+    "count": total_length,  # 仮のブロック数
+    "total_length": total_length,  # 全長
+    "height": 20  # 仮で高さ20cm
+})
 
 if __name__ == '__main__':
     # RenderではWaitressを使う（Flask標準サーバーだと警告が出る）
