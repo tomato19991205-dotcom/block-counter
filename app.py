@@ -1,48 +1,63 @@
-import os, tempfile
-import pdfplumber
-from flask import Flask, render_template, request
+import os
+import tempfile
+import fitz  # PyMuPDF
+import cv2
+import numpy as np
+from flask import Flask, render_template, request, jsonify
 from waitress import serve
+from PIL import Image
 
 app = Flask(__name__)
 
-@app.route("/")
+def detect_blocks(image_path):
+    img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    img = cv2.medianBlur(img, 5)
+    edges = cv2.Canny(img, 50, 150)
+    
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    block_count = 0
+    total_length = 0
+
+    for cnt in contours:
+        x, y, w, h = cv2.boundingRect(cnt)
+        if 30 < w < 400 and 15 < h < 300:
+            block_count += 1
+            total_length += w
+
+    return block_count, total_length
+
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/upload", methods=["POST"])
+@app.route('/upload', methods=['POST'])
 def upload_file():
-    if "file" not in request.files or request.files["file"].filename == "":
-        return render_template("index.html", result={"error": "PDFが選択されていません"})
+    file = request.files['file']
+    if not file:
+        return jsonify({'error': 'ファイルがありません'})
 
-    f = request.files["file"]
-    # 一時ファイルに保存
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-        f.save(tmp.name)
-        temp_path = tmp.name
+    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    file.save(temp_pdf.name)
 
-    try:
-        # ここは仮ロジック（まずは動くことを優先）
-        total_length = 0
-        count = 0
-        with pdfplumber.open(temp_path) as pdf:
-            for page in pdf.pages:
-                text = page.extract_text() or ""
-                total_length += len(text)
-                count += text.count("CB")  # 仮の数え方
+    pdf = fitz.open(temp_pdf.name)
+    first_page = pdf.load_page(0)
+    pix = first_page.get_pixmap(dpi=200)
+    img_path = temp_pdf.name.replace(".pdf", ".png")
+    pix.save(img_path)
 
-        return render_template("index.html", result={
-            "count": count,
-            "total_length": total_length,
-            "height": "20cm（仮）"
-        })
-    except Exception as e:
-        return render_template("index.html", result={"error": str(e)})
-    finally:
-        try:
-            os.remove(temp_path)
-        except:
-            pass
+    block_count, total_length = detect_blocks(img_path)
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "10000"))
-    serve(app, host="0.0.0.0", port=port)  # Render向け
+    os.remove(temp_pdf.name)
+    os.remove(img_path)
+
+    return render_template(
+        'index.html',
+        result={
+            'blocks': block_count,
+            'total_length': total_length,
+            'height': 20
+        }
+    )
+
+if __name__ == '__main__':
+    serve(app, host='0.0.0.0', port=10000)
