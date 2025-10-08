@@ -1,37 +1,48 @@
-import tempfile
+import os, tempfile
 import pdfplumber
-import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
+from waitress import serve
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/upload', methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload_file():
-    file = request.files['file']
+    if "file" not in request.files or request.files["file"].filename == "":
+        return render_template("index.html", result={"error": "PDFが選択されていません"})
 
-    # Renderでは一時フォルダを使う
-    temp_path = os.path.join(tempfile.gettempdir(), file.filename)
-    file.save(temp_path)
+    f = request.files["file"]
+    # 一時ファイルに保存
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        f.save(tmp.name)
+        temp_path = tmp.name
 
-    # PDFを解析
-    with pdfplumber.open(temp_path) as pdf:
+    try:
+        # ここは仮ロジック（まずは動くことを優先）
         total_length = 0
-        for page in pdf.pages:
-            text = page.extract_text()
-            if text:
+        count = 0
+        with pdfplumber.open(temp_path) as pdf:
+            for page in pdf.pages:
+                text = page.extract_text() or ""
                 total_length += len(text)
+                count += text.count("CB")  # 仮の数え方
 
-    return render_template("index.html", result={
-    "count": total_length,  # 仮のブロック数
-    "total_length": total_length,  # 全長
-    "height": 20  # 仮で高さ20cm
-})
+        return render_template("index.html", result={
+            "count": count,
+            "total_length": total_length,
+            "height": "20cm（仮）"
+        })
+    except Exception as e:
+        return render_template("index.html", result={"error": str(e)})
+    finally:
+        try:
+            os.remove(temp_path)
+        except:
+            pass
 
-if __name__ == '__main__':
-    # RenderではWaitressを使う（Flask標準サーバーだと警告が出る）
-    from waitress import serve
-    serve(app, host='0.0.0.0', port=10000)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "10000"))
+    serve(app, host="0.0.0.0", port=port)  # Render向け
