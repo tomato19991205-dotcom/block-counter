@@ -3,4 +3,4 @@ pdf2image
 opencv-python-headless
 numpy
 Pillow
-fitz
+PyMuPDF
