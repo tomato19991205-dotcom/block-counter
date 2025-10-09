@@ -31,7 +31,7 @@ def upload():
         # 画像データのチャンネル数に応じて処理を分ける
         img_data = np.frombuffer(pix.samples, dtype=np.uint8)
 
-        if pix.alpha:  # RGBA
+        if pix.alpha:  # RGBA画像
             img = img_data.reshape(pix.height, pix.width, 4)
             img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
         else:
@@ -44,7 +44,7 @@ def upload():
         # 通常の画像を読み込み
         img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
 
-    # 画像処理開始
+    # ===== ここから画像処理 =====
     if img is None or img.size == 0:
         raise ValueError("画像の読み込みに失敗しました。")
 
@@ -81,6 +81,7 @@ def upload():
 
 except Exception as e:
     return render_template('index.html', result={'error': str(e)})
+    
     
 
 if __name__ == '__main__':
