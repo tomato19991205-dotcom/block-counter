@@ -18,21 +18,21 @@ def upload():
         return render_template('index.html', result={'error': 'ファイルが選択されていません。'})
 
     try:    
-    #----改良版ブロック検出----
-    # グレースケール変換
+    　　    #----改良版ブロック検出----
+           # グレースケール変換
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # ノイズ除去
+           # ノイズ除去
     blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
-    # エッジ検出
+           # エッジ検出
     edges = cv2.Canny(blur, 80, 180)
 
-    # 線を太らせて連続性を上げる
+           # 線を太らせて連続性を上げる
     kernel = np.ones((2, 2), np.uint8)
     dilated = cv2.dilate(edges, kernel, iterations=1)
 
-    # 輪郭を検出
+           # 輪郭を検出
     contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     block_count = 0
     total_length = 0
