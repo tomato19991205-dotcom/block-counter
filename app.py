@@ -47,10 +47,20 @@ try:
         'image_base64': img_base64
     }
 
-    return render_template('index.html', result=result)
+    return
 
-except Exception as e:
-    return render_template('index.html', result={'error': str(e)})
+
+render_template('index.html , result=result)
+
+except Exception as e: 
+
+    return
+
+render_template('index.html
+
+, result={'error':
+
+str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
