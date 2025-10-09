@@ -16,17 +16,17 @@ def upload():
     file = request.files['file']
     if not file:
         return render_template('index.html', result={'error': 'ファイルが選択されていません。'})
-
-    try:    
-           # ---- 改良版ブロック検出 ----
-           # グレースケール変換
+try:
+    # ---- 改良版ブロック検出 ----
+    # グレースケール変換
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-           # ノイズ除去
+    # ノイズ除去
     blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
-           # エッジ検出
-    edges = cv2.Canny(blur, 80, 180)
+    # エッジ検出
+    edges = cv2.Canny(blur, 80, 180) 
+           
 
            # 線を太らせて連続性を上げる
     kernel = np.ones((2, 2), np.uint8)
