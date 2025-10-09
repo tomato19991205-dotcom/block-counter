@@ -17,8 +17,7 @@ def upload():
     if not file:
         return render_template('index.html', result={'error': 'ファイルが選択されていません。'})
 
-    try:
-        #----改良版ブロック検出----
+    try:    #----改良版ブロック検出----
     　　　　# グレースケール変換
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
