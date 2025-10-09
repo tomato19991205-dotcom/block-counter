@@ -52,17 +52,24 @@ try:
     img_base64 = base64.b64encode(buffer).decode('utf-8')
 
     result = {
-        'block_count': block_count,
-        'total_length': total_length,
-        'height': 20,
-        'image_base64': img_base64
-    }
 
-    return render_template('index.html', result=result)
+'block_count':
 
-# 🔻 これが無かったからSyntaxErrorが出てた！
-except Exception as e:
-    return render_template('index.html', result={'error': str(e)})
+block_count,
+
+total_length,
+
+'total_length':
+
+'height': 20, 'image_base64':
+
+return
+
+img_base64 }
+
+render_template('index.html ', result=result) # ! 必ずインデントを入れる
+
+except Exception as e: return render_template('index.html , result={'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
