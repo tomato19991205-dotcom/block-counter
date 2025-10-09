@@ -7,60 +7,47 @@ import base64
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    return render_template('index.html', result=None)
-
 @app.route('/', methods=['POST'])
 def upload():
     file = request.files['file']
     if not file:
-        return render_template('index.html', result={'error': 'ファイルが選択されていません。'})
-try:
-    # ---- 改良版ブロック検出 ----
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (3, 3), 0)
-    edges = cv2.Canny(blur, 80, 180)
-    kernel = np.ones((2, 2), np.uint8)
-    dilated = cv2.dilate(edges, kernel, iterations=1)
-    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        return render_template('index.html')
 
-    block_count = 0
-    total_length = 0
+    try:
+        img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (3, 3), 0)
+        edges = cv2.Canny(blur, 80, 180)
+        kernel = np.ones((2, 2), np.uint8)
+        dilated = cv2.dilate(edges, kernel, iterations=1)
+        contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    for c in contours:
-        x, y, w, h = cv2.boundingRect(c)
-        if w > 40 and h > 10:
-            aspect = w / h
-            if 1.5 < aspect < 8:
-                block_count += 1
-                total_length += w
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        block_count = 0
+        total_length = 0
 
-    _, buffer = cv2.imencode('.png', img)
-    img_base64 = base64.b64encode(buffer).decode('utf-8')
+        for c in contours:
+            x, y, w, h = cv2.boundingRect(c)
+            if w > 40 and h > 10:
+                aspect = w / h
+                if 1.5 < aspect < 8:
+                    block_count += 1
+                    total_length += w
+                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-    result = {
-        'block_count': block_count,
-        'total_length': total_length,
-        'height': 20,
-        'image_base64': img_base64
-    }
+        _, buffer = cv2.imencode('.png', img)
+        img_base64 = base64.b64encode(buffer).decode('utf-8')
 
-        return
+        result = {
+            'block_count': block_count,
+            'total_length': total_length,
+            'height': 20,
+            'image_base64': img_base64
+        }
 
+        return render_template('index.html', result=result)
 
-             render_template('index.html' , result=result)
-
-        except Exception as e: 
-
-         return
-
-render_template('index.html'
-
-, result={'error':
-
-str(e)})
+    except Exception as e:
+        return render_template('index.html', result={'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
