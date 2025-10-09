@@ -40,9 +40,9 @@ def upload():
         except:
             img = img_data.reshape(pix.height, pix.width)
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-        else:
-            # 通常の画像として読み込み
-            img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+else:
+    # 通常の画像として読み込み
+    img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
 
         if img is None or img.size == 0:
             raise ValueError("画像の読み込みに失敗しました。")
