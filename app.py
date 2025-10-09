@@ -7,8 +7,11 @@ import base64
 
 app = Flask(__name__)
 
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET', 'POST'])
 def upload():
+    if request.method == 'GET':
+        return render_template('index.html')
+
     file = request.files['file']
     if not file:
         return render_template('index.html')
