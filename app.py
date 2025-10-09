@@ -50,11 +50,11 @@ try:
     return
 
 
-    render_template('index.html' , result=result)
+             render_template('index.html' , result=result)
 
 except Exception as e: 
 
-    return
+         return
 
 render_template('index.html'
 
