@@ -23,11 +23,23 @@ def upload():
         filename = file.filename.lower()
 
         if filename.endswith('.pdf'):
-            # PDFを画像に変換
-            pdf = fitz.open(stream=file.read(), filetype="pdf")
-            page = pdf.load_page(0)
-            pix = page.get_pixmap()
-            img = np.frombuffer(pix.tobytes(), dtype=np.uint8).reshape(pix.height, pix.width, 3)
+    # PDFを画像に変換
+    pdf = fitz.open(stream=file.read(), filetype="pdf")
+    page = pdf.load_page(0)
+    pix = page.get_pixmap()
+
+    # 画像データのチャンネル数に応じて処理を分ける
+    img_data = np.frombuffer(pix.samples, dtype=np.uint8)
+
+    if pix.alpha:  # 透明度付き (RGBA)
+        img = img_data.reshape(pix.height, pix.width, 4)
+        img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
+    else:
+        try:
+            img = img_data.reshape(pix.height, pix.width, 3)
+        except:
+            img = img_data.reshape(pix.height, pix.width)
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
         else:
             # 通常の画像として読み込み
             img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
