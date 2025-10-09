@@ -69,9 +69,7 @@ img_base64
 
 }
 
-return
-
-render_template('index.html , result=result)
+return render_template('index.html', result=result)
 
 except Exception as e:
 
