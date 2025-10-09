@@ -22,7 +22,7 @@ def upload():
     try:
         filename = file.filename.lower()
 
-        if filename.endswith('.pdf'):
+          if filename.endswith('.pdf'):
     # PDFを画像に変換
     pdf = fitz.open(stream=file.read(), filetype="pdf")
     page = pdf.load_page(0)
