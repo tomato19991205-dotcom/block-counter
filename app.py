@@ -56,7 +56,7 @@ except Exception as e:
 
     return
 
-render_template('index.html
+render_template('index.html'
 
 , result={'error':
 
