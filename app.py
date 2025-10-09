@@ -39,7 +39,7 @@ def upload():
 
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
-        # 小さすぎる線、文字、寸法などを除外
+           # 小さすぎる線、文字、寸法などを除外
         if w > 40 and h > 10:
             aspect = w / h
             if 1.5 < aspect < 8:  # 横長すぎず縦長すぎない長方形
@@ -47,7 +47,7 @@ def upload():
                 total_length += w
                 cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-    # 結果画像をBase64に変換
+           # 結果画像をBase64に変換
     _, buffer = cv2.imencode('.png', img)
     img_base64 = base64.b64encode(buffer).decode('utf-8')
 
