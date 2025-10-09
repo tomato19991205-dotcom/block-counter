@@ -19,7 +19,7 @@ def upload():
 
     try:    
     #----改良版ブロック検出----
-    　　　　# グレースケール変換
+    # グレースケール変換
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # ノイズ除去
