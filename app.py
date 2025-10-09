@@ -17,7 +17,6 @@ def upload():
     if not file:
         return render_template('index.html', result={'error': 'ファイルが選択されていません。'})
 try:
-    try:
     # ---- 改良版ブロック検出 ----
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (3, 3), 0)
