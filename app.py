@@ -20,7 +20,7 @@ def upload():
         return render_template('index.html', result={'error': 'ファイルが選択されていません'})
 
     try:
-    filename = file.filename.lower()
+        filename = file.filename.lower()
 
     if filename.endswith('.pdf'):
         # PDFを画像に変換
