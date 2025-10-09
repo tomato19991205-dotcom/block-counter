@@ -47,12 +47,12 @@ try:
         'image_base64': img_base64
     }
 
-    return
+        return
 
 
              render_template('index.html' , result=result)
 
-except Exception as e: 
+        except Exception as e: 
 
          return
 
