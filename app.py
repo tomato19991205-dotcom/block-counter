@@ -34,13 +34,13 @@ def upload():
         if pix.alpha:  # RGBA画像
             img = img_data.reshape(pix.height, pix.width, 4)
             img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGR)
-        else:
-            try:
+     else:
+     try:
                 img = img_data.reshape(pix.height, pix.width, 3)
             except:
                 img = img_data.reshape(pix.height, pix.width)
                 img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
-    else:
+     else:
         # 通常の画像を読み込み
         img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
 
