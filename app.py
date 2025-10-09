@@ -4,8 +4,11 @@ import cv2
 import numpy as np
 import io
 import base64
+import fitz  # PyMuPDF
+
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def upload():
@@ -14,10 +17,24 @@ def upload():
 
     file = request.files['file']
     if not file:
-        return render_template('index.html')
+        return render_template('index.html', result={'error': 'ファイルが選択されていません'})
 
     try:
-        img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+        filename = file.filename.lower()
+
+        if filename.endswith('.pdf'):
+            # PDFを画像に変換
+            pdf = fitz.open(stream=file.read(), filetype="pdf")
+            page = pdf.load_page(0)
+            pix = page.get_pixmap()
+            img = np.frombuffer(pix.tobytes(), dtype=np.uint8).reshape(pix.height, pix.width, 3)
+        else:
+            # 通常の画像として読み込み
+            img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+
+        if img is None or img.size == 0:
+            raise ValueError("画像の読み込みに失敗しました。")
+
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
         edges = cv2.Canny(blur, 80, 180)
