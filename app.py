@@ -47,7 +47,10 @@ def upload():
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
-        edges = cv2.Canny(blur, 80, 180)
+
+        # 感度を上げる
+        edges = cv2.Canny(blur, 30, 120)
+
         kernel = np.ones((2, 2), np.uint8)
         dilated = cv2.dilate(edges, kernel, iterations=1)
         contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -57,9 +60,11 @@ def upload():
 
         for c in contours:
             x, y, w, h = cv2.boundingRect(c)
-            if w > 40 and h > 10:
+            # 小さめの線も検出するように変更
+            if w > 20 and h > 5:
                 aspect = w / h
-                if 1.5 < aspect < 8:
+                # アスペクト比を緩める
+                if 1.0 < aspect < 10:
                     block_count += 1
                     total_length += w
                     cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
