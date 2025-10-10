@@ -57,7 +57,7 @@ def upload():
         total_length = 0
 
 try:
-    for c in contours:
+     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
         area = w * h
 
