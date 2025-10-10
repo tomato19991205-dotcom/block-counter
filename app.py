@@ -46,14 +46,24 @@ def upload():
         img = img.copy()
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
-        # 感度を上げる
-        edges = cv2.Canny(blur, 30, 120)
+# 明暗差を強調する
+gray = cv2.equalizeHist(gray)
 
-        kernel = np.ones((2, 2), np.uint8)
-        dilated = cv2.dilate(edges, kernel, iterations=1)
-        contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# 適応的二値化を追加（明暗のムラに強い）
+thresh = cv2.adaptiveThreshold(
+    gray, 255,
+    cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+    cv2.THRESH_BINARY_INV,
+    25, 10
+)
+
+# 膨張処理で線を太くしてつなげる
+kernel = np.ones((3, 3), np.uint8)
+dilated = cv2.dilate(thresh, kernel, iterations=1)
+
+# Cannyより明確に輪郭が取れる
+contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         block_count = 0
         total_length = 0
