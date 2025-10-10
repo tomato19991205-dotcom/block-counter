@@ -45,55 +45,38 @@ def upload():
         # 🔽 この1行を追加！
         img = img.copy()
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        try:
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.equalizeHist(gray)
 
-# 明暗差を強調する
-gray = cv2.equalizeHist(gray)
+    # 明暗差を強調する
+    thresh = cv2.adaptiveThreshold(
+        gray, 255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV,
+        25, 10
+    )
 
-# 適応的二値化を追加（明暗のムラに強い）
-thresh = cv2.adaptiveThreshold(
-    gray, 255,
-    cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-    cv2.THRESH_BINARY_INV,
-    25, 10
-)
+    kernel = np.ones((3, 3), np.uint8)
+    dilated = cv2.dilate(thresh, kernel, iterations=1)
+    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-# 膨張処理で線を太くしてつなげる
-kernel = np.ones((3, 3), np.uint8)
-dilated = cv2.dilate(thresh, kernel, iterations=1)
+    block_count = 0
+    total_length = 0
 
-# Cannyより明確に輪郭が取れる
-contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+        area = w * h
+        if area < 200 or area > 50000:
+            continue
+        aspect = w / h
+        if 1.0 < aspect < 8.0:
+            block_count += 1
+            total_length += w
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        block_count = 0
-        total_length = 0
-
-        for c in contours:
-    x, y, w, h = cv2.boundingRect(c)
-    area = w * h
-    if area < 200 or area > 50000:  # 小さすぎ・大きすぎるものは除外
-        continue
-
-    aspect = w / h
-    if 1.0 < aspect < 8.0:
-        block_count += 1
-        total_length += w
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
-        _, buffer = cv2.imencode('.png', img)
-        img_base64 = base64.b64encode(buffer).decode('utf-8')
-
-        result = {
-            'block_count': block_count,
-            'total_length': total_length,
-            'height': 20,
-            'image_base64': img_base64
-        }
-
-        return render_template('index.html', result=result)
-
-    except Exception as e:
-        return render_template('index.html', result={'error': str(e)})
+except Exception as e:
+    return render_template('index.html', result={'error': str(e)})
 
 
 if __name__ == '__main__':
