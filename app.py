@@ -46,6 +46,9 @@ def upload():
         img = img.copy()
 
 try:
+    
+    
+    
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.equalizeHist(gray)
     thresh = cv2.adaptiveThreshold(
