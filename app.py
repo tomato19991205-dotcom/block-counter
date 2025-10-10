@@ -42,6 +42,9 @@ def upload():
         if img is None or img.size == 0:
             raise ValueError("画像の読み込みに失敗しました。")
 
+        # 🔽 この1行を追加！
+        img = img.copy()
+
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (3, 3), 0)
         edges = cv2.Canny(blur, 80, 180)
