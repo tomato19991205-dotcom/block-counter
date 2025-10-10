@@ -45,18 +45,15 @@ def upload():
         # 🔽 この1行を追加！
         img = img.copy()
 
-        try:
+try:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.equalizeHist(gray)
-
-    # 明暗差を強調する
     thresh = cv2.adaptiveThreshold(
         gray, 255,
         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
         cv2.THRESH_BINARY_INV,
         25, 10
     )
-
     kernel = np.ones((3, 3), np.uint8)
     dilated = cv2.dilate(thresh, kernel, iterations=1)
     contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
