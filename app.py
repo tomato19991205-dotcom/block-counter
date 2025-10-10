@@ -56,38 +56,25 @@ def upload():
         block_count = 0
         total_length = 0
 
-for c in contours:
-    x, y, w, h = cv2.boundingRect(c)
-    area = w * h
+try:
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+        area = w * h
 
-    # 小さいノイズや大きすぎる枠を除外
-    if area < 1000 or area > 80000:
-        continue
+        # 小さいノイズや大きすぎる枠を除外
+        if area < 1000 or area > 80000:
+            continue
 
-    aspect = w / h
+        aspect = w / h
 
-    # ブロックの形（横長）をより限定
-    if 3.0 < aspect < 7.0 and 20 < h < 200:
-        block_count += 1
-        total_length += w
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # ブロックの形（横長）をより限定
+        if 3.0 < aspect < 7.0 and 20 < h < 200:
+            block_count += 1
+            total_length += w
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        # 結果をエンコード
-        _, buffer = cv2.imencode('.png', img)
-        img_base64 = base64.b64encode(buffer).decode('utf-8')
-
-        result = {
-            'block_count': block_count,
-            'total_length': total_length,
-            'height': 20,
-            'image_base64': img_base64
-        }
-
-        return render_template('index.html', result=result)
-
-    except Exception as e:
-        return render_template('index.html', result={'error': str(e)})
-
+except Exception as e:
+    return render_template('index.html', result={'error': str(e)})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
