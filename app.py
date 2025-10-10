@@ -57,15 +57,20 @@ def upload():
         total_length = 0
 
         for c in contours:
-            x, y, w, h = cv2.boundingRect(c)
-            area = w * h
-            if area < 200 or area > 50000:
-                continue
-            aspect = w / h
-            if 1.0 < aspect < 8.0:
-                block_count += 1
-                total_length += w
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+    x, y, w, h = cv2.boundingRect(c)
+    area = w * h
+
+    # 小さいノイズや大きすぎる枠を除外
+    if area < 1000 or area > 80000:
+        continue
+
+    aspect = w / h
+
+    # ブロックの形（横長）をより限定
+    if 3.0 < aspect < 7.0 and 20 < h < 200:
+        block_count += 1
+        total_length += w
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
         # 結果をエンコード
         _, buffer = cv2.imencode('.png', img)
