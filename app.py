@@ -69,15 +69,16 @@ contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMP
         total_length = 0
 
         for c in contours:
-            x, y, w, h = cv2.boundingRect(c)
-            # 小さめの線も検出するように変更
-            if w > 20 and h > 5:
-                aspect = w / h
-                # アスペクト比を緩める
-                if 1.0 < aspect < 10:
-                    block_count += 1
-                    total_length += w
-                    cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+    x, y, w, h = cv2.boundingRect(c)
+    area = w * h
+    if area < 200 or area > 50000:  # 小さすぎ・大きすぎるものは除外
+        continue
+
+    aspect = w / h
+    if 1.0 < aspect < 8.0:
+        block_count += 1
+        total_length += w
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
         _, buffer = cv2.imencode('.png', img)
         img_base64 = base64.b64encode(buffer).decode('utf-8')
